@@ -7,10 +7,8 @@ from routes.workout_routes import workout_bp
 app = Flask(__name__)
 app.config.from_object(Config)
 
-
 CORS(app)
 mongo.init_app(app)
-
 
 @app.route("/")
 def home():
@@ -24,6 +22,11 @@ def health_check():
         "status": "success",
         "message": "Backend is working"
     }), 200
+
+@app.route("/test-db")
+def test_db():
+    mongo.db.test.insert_one({"name": "Asma"})
+    return jsonify({"message": "Inserted successfully"}), 200
 
 app.register_blueprint(workout_bp)
 
