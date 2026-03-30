@@ -3,6 +3,7 @@ from flask_cors import CORS
 from config import Config
 from services.db import mongo
 from routes.workout_routes import workout_bp
+from routes.meal_routes import meal_bp
 
 # Initialize app
 app = Flask(__name__)
@@ -100,12 +101,14 @@ def ai_insights_page():
     return render_template("ai_insights.html", insights=insights)
 
 # ------------------------
-# REGISTER WORKOUT API BLUEPRINT
+# REGISTER API BLUEPRINTS
 # ------------------------
 app.register_blueprint(workout_bp)
+app.register_blueprint(meal_bp)
 
 # ------------------------
 # RUN APP
 # ------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+    
