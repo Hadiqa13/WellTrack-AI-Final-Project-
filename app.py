@@ -4,6 +4,7 @@ from config import Config
 from services.db import mongo
 from routes.workout_routes import workout_bp
 from routes.meal_routes import meal_bp
+from routes.sleep_routes import sleep_bp
 
 # Initialize app
 app = Flask(__name__)
@@ -23,8 +24,8 @@ def dashboard():
     sleeps = list(mongo.db.sleeps.find({}, {"_id": 0}))
 
     # Calculate averages
-    avg_workout = round(sum(w['duration'] for w in workouts)/len(workouts), 2) if workouts else 0
-    avg_sleep = round(sum(s['duration'] for s in sleeps)/len(sleeps), 2) if sleeps else 0
+    avg_workout = round(sum(w['duration'] for w in workouts) / len(workouts), 2) if workouts else 0
+    avg_sleep = round(sum(s['duration'] for s in sleeps) / len(sleeps), 2) if sleeps else 0
 
     return render_template(
         "dashboard.html",
@@ -105,6 +106,7 @@ def ai_insights_page():
 # ------------------------
 app.register_blueprint(workout_bp)
 app.register_blueprint(meal_bp)
+app.register_blueprint(sleep_bp)
 
 # ------------------------
 # RUN APP
