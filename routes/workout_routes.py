@@ -13,6 +13,8 @@ def get_workouts():
 @workout_bp.route("/api/workouts", methods=["POST"])
 def add_workout():
     data = request.get_json()
+
+    # if user sends nothing
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
