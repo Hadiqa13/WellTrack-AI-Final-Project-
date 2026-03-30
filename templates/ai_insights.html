@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Insights - WellTrack AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+<nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
+    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
+    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
+    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
+</nav>
+</header>
+
+<main>
+<h1>AI Insights</h1>
+
+<!-- Add New Insight -->
+<form method="POST">
+    <label>Title:</label>
+    <input type="text" name="title" required>
+    
+    <label>Description:</label>
+    <textarea name="description" rows="4" required></textarea>
+    
+    <button type="submit">Add Insight</button>
+</form>
+
+<!-- Display Existing Insights -->
+<section class="data-summary">
+<h2>Existing Insights</h2>
+<ul>
+{% for insight in insights %}
+<li><strong>{{ insight.title }}</strong>: {{ insight.description }}</li>
+{% endfor %}
+</ul>
+</section>
+</main>
+</body>
+</html>
