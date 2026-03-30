@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Meal - WellTrack AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+<nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
+    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
+    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
+    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
+</nav>
+</header>
+
+<main>
+<h1>Add Meal</h1>
+<form method="POST" action="{{ url_for('add_meal_page') }}">
+<label>Meal Name:</label>
+<input type="text" name="meal_type" required>
+
+<label>Calories:</label>
+<input type="number" name="calories" required>
+
+<button type="submit">Add Meal</button>
+</form>
+</main>
+</body>
+</html>

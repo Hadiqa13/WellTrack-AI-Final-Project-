@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - WellTrack AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+<nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
+    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
+    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
+    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
+</nav>
+</header>
+
+<main>
+<h1>Welcome to WellTrack AI</h1>
+
+<section class="data-summary">
+<h2>Workout Summary</h2>
+<p>Avg Workout Duration: {{ avg_workout }} minutes</p>
+<ul>
+{% for workout in workouts %}
+<li>{{ workout['workout_type'] }} - {{ workout['duration'] }} minutes, {{ workout.get('calories_burned', 0) }} calories</li>
+{% endfor %}
+</ul>
+
+<h2>Meal Summary</h2>
+<ul>
+{% for meal in meals %}
+<li>{{ meal['meal_type'] }} - {{ meal['calories'] }} calories</li>
+{% endfor %}
+</ul>
+
+<h2>Sleep Summary</h2>
+<p>Avg Sleep Duration: {{ avg_sleep }} hours</p>
+<ul>
+{% for sleep in sleeps %}
+<li>{{ sleep['duration'] }} hours of sleep, Quality: {{ sleep.get('quality', 'N/A') }}</li>
+{% endfor %}
+</ul>
+</section>
+
+<section class="ai-insights">
+    <h2>AI Insights</h2>
+    {% if ai_insights %}
+        <div class="ai-cards">
+            {% for insight in ai_insights %}
+                <div class="ai-card">
+                    <h3>{{ insight.title }}</h3>
+                    <p>{{ insight.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No AI insights yet. Add or generate some!</p>
+    {% endif %}
+</section>
+</main>
+</body>
+</html>
