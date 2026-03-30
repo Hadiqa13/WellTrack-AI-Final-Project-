@@ -11,6 +11,9 @@ def get_workouts():
 @workout_bp.route("/api/workouts", methods=["POST"])
 def add_workout():
     data = request.get_json()
+    #if user sends nothing, API gives error msg
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
     workout = {
         "workout_type": data.get("workout_type"),
@@ -18,6 +21,11 @@ def add_workout():
         "calories_burned": data.get("calories_burned"),
         "date": data.get("date")
     }
+    # imp fields must be given, otherwise API returns error msg
+    if not workout["workout_type"] or not workout["duration"] or not workout["date"]:
+        return jsonify({
+            "error": "workout_type, duration, and date are required"
+        }), 400
 
     mongo.db.workouts.insert_one(workout)
 
