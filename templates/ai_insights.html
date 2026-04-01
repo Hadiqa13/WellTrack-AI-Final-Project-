@@ -1,45 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Insights - WellTrack AI</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-<header>
-<nav>
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
-    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
-    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
-    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
-</nav>
-</header>
+{% extends "base.html" %}
 
-<main>
-<h1>AI Insights</h1>
+{% block title %}AI Insights - WellTrack AI{% endblock %}
 
-<!-- Add New Insight -->
-<form method="POST">
-    <label>Title:</label>
-    <input type="text" name="title" required>
-    
-    <label>Description:</label>
-    <textarea name="description" rows="4" required></textarea>
-    
-    <button type="submit">Add Insight</button>
-</form>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h2 class="mb-4 text-center"><i class="fas fa-brain text-primary me-2"></i>AI Insights</h2>
+        
+        <!-- Add New Insight Form -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Add New Insight</h5>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-2"></i>Add Insight
+                    </button>
+                </form>
+            </div>
+        </div>
 
-<!-- Display Existing Insights -->
-<section class="data-summary">
-<h2>Existing Insights</h2>
-<ul>
-{% for insight in insights %}
-<li><strong>{{ insight.title }}</strong>: {{ insight.description }}</li>
-{% endfor %}
-</ul>
-</section>
-</main>
-</body>
-</html>
+        <!-- Existing Insights -->
+        <h4 class="mb-3">Existing Insights</h4>
+        {% if insights %}
+        <div class="row g-4">
+            {% for insight in insights %}
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ insight.title }}</h5>
+                        <p class="card-text">{{ insight.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            No insights added yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,65 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - WellTrack AI</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-<header>
-<nav>
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
-    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
-    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
-    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
-</nav>
-</header>
+{% extends "base.html" %}
 
-<main>
-<h1>Welcome to WellTrack AI</h1>
+{% block title %}Dashboard - WellTrack AI{% endblock %}
 
-<section class="data-summary">
-<h2>Workout Summary</h2>
-<p>Avg Workout Duration: {{ avg_workout }} minutes</p>
-<ul>
-{% for workout in workouts %}
-<li>{{ workout['workout_type'] }} - {{ workout['duration'] }} minutes, {{ workout.get('calories_burned', 0) }} calories</li>
-{% endfor %}
-</ul>
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4 text-center fw-bold">
+            <i class="fas fa-chart-line text-success me-2"></i>Welcome Back!
+        </h1>
+    </div>
+</div>
 
-<h2>Meal Summary</h2>
-<ul>
-{% for meal in meals %}
-<li>{{ meal['meal_type'] }} - {{ meal['calories'] }} calories</li>
-{% endfor %}
-</ul>
-
-<h2>Sleep Summary</h2>
-<p>Avg Sleep Duration: {{ avg_sleep }} hours</p>
-<ul>
-{% for sleep in sleeps %}
-<li>{{ sleep['duration'] }} hours of sleep, Quality: {{ sleep.get('quality', 'N/A') }}</li>
-{% endfor %}
-</ul>
-</section>
-
-<section class="ai-insights">
-    <h2>AI Insights</h2>
-    {% if ai_insights %}
-        <div class="ai-cards">
-            {% for insight in ai_insights %}
-                <div class="ai-card">
-                    <h3>{{ insight.title }}</h3>
-                    <p>{{ insight.description }}</p>
-                </div>
-            {% endfor %}
+<div class="row g-4">
+    <!-- Workout Summary -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-dumbbell me-2"></i>Workout Summary</h5>
+            </div>
+            <div class="card-body">
+                <p class="fs-5"><strong>Avg Duration:</strong> {{ avg_workout }} minutes</p>
+                <ul class="list-group list-group-flush">
+                    {% for workout in workouts %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ workout['workout_type'] }}</span>
+                        <span class="badge bg-success">{{ workout['duration'] }} min • {{ workout.get('calories_burned', 0) }} cal</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+    </div>
+
+    <!-- Meal Summary -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-utensils me-2"></i>Meal Summary</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for meal in meals %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ meal['meal_type'] }}</span>
+                        <span class="badge bg-warning text-dark">{{ meal['calories'] }} cal</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sleep Summary -->
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-bed me-2"></i>Sleep Summary</h5>
+            </div>
+            <div class="card-body">
+                <p class="fs-5"><strong>Avg Sleep:</strong> {{ avg_sleep }} hours</p>
+                <ul class="list-group list-group-flush">
+                    {% for sleep in sleeps %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ sleep['duration'] }} hours</span>
+                        <span class="badge bg-info">{{ sleep.get('quality', 'N/A') }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Insights Section -->
+<div class="mt-5">
+    <h2 class="mb-4"><i class="fas fa-brain text-primary me-2"></i>AI Insights</h2>
+    {% if ai_insights %}
+    <div class="row g-4">
+        {% for insight in ai_insights %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card ai-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ insight.title }}</h5>
+                    <p class="card-text">{{ insight.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <p>No AI insights yet. Add or generate some!</p>
+    <div class="alert alert-info text-center">
+        No AI insights yet. Add some data or generate insights!
+    </div>
     {% endif %}
-</section>
-</main>
-</body>
-</html>
+</div>
+{% endblock %}
