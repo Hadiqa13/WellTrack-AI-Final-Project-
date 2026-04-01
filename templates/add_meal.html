@@ -1,33 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Meal - WellTrack AI</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-<header>
-<nav>
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
-    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
-    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
-    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
-</nav>
-</header>
+{% extends "base.html" %}
 
-<main>
-<h1>Add Meal</h1>
-<form method="POST" action="{{ url_for('add_meal_page') }}">
-<label>Meal Name:</label>
-<input type="text" name="meal_type" required>
+{% block title %}Add Meal - WellTrack AI{% endblock %}
 
-<label>Calories:</label>
-<input type="number" name="calories" required>
-
-<button type="submit">Add Meal</button>
-</form>
-</main>
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="form-card card">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4 text-warning">
+                    <i class="fas fa-utensils me-2"></i>Add New Meal
+                </h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Meal Name / Type</label>
+                        <input type="text" name="meal_type" class="form-control" required placeholder="e.g. Grilled Chicken, Salad">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Calories</label>
+                        <input type="number" name="calories" class="form-control" required min="0">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        <i class="fas fa-plus me-2"></i>Add Meal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,39 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Workout - WellTrack AI</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-<header>
-<nav>
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('add_workout_page') }}">Add Workout</a>
-    <a href="{{ url_for('add_meal_page') }}">Add Meal</a>
-    <a href="{{ url_for('add_sleep_page') }}">Add Sleep</a>
-    <a href="{{ url_for('ai_insights_page') }}">AI Insights</a>
-</nav>
-</header>
+{% extends "base.html" %}
 
-<main>
-<h1>Add Workout</h1>
-<form method="POST" action="{{ url_for('add_workout_page') }}">
-<label>Workout Type:</label>
-<input type="text" name="workout_type" required>
+{% block title %}Add Workout - WellTrack AI{% endblock %}
 
-<label>Duration (minutes):</label>
-<input type="number" name="duration" required>
-
-<label>Calories Burned:</label>
-<input type="number" name="calories_burned">
-
-<label>Date:</label>
-<input type="date" name="date" required>
-
-<button type="submit">Add Workout</button>
-</form>
-</main>
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="form-card card">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4 text-success">
+                    <i class="fas fa-dumbbell me-2"></i>Add New Workout
+                </h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Workout Type</label>
+                        <input type="text" name="workout_type" class="form-control" required placeholder="e.g. Running, Gym, Yoga">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Duration (minutes)</label>
+                        <input type="number" name="duration" class="form-control" required min="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Calories Burned</label>
+                        <input type="number" name="calories_burned" class="form-control" placeholder="Optional">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        <i class="fas fa-plus me-2"></i>Add Workout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
