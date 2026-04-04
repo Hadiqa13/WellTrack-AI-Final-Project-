@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for
 from flask_cors import CORS
 from config import Config
 from services.db import mongo
 from routes.workout_routes import workout_bp
 from routes.meal_routes import meal_bp
 from routes.sleep_routes import sleep_bp
+from routes.ai import ai_bp
 
 # Initialize app
 app = Flask(__name__)
@@ -18,14 +19,12 @@ mongo.init_app(app)
 @app.route("/")
 @app.route("/dashboard")
 def dashboard():
-    # Fetch data from MongoDB
     workouts = list(mongo.db.workouts.find({}, {"_id": 0}))
     meals = list(mongo.db.meals.find({}, {"_id": 0}))
     sleeps = list(mongo.db.sleeps.find({}, {"_id": 0}))
 
-    # Calculate averages
-    avg_workout = round(sum(w['duration'] for w in workouts) / len(workouts), 2) if workouts else 0
-    avg_sleep = round(sum(s['duration'] for s in sleeps) / len(sleeps), 2) if sleeps else 0
+    avg_workout = round(sum(w.get("duration", 0) for w in workouts) / len(workouts), 2) if workouts else 0
+    avg_sleep = round(sum(s.get("duration", 0) for s in sleeps) / len(sleeps), 2) if sleeps else 0
 
     return render_template(
         "dashboard.html",
@@ -51,6 +50,7 @@ def add_workout_page():
         }
         mongo.db.workouts.insert_one(workout)
         return redirect(url_for("dashboard"))
+
     return render_template("add_workout.html")
 
 # ------------------------
@@ -66,6 +66,7 @@ def add_meal_page():
         }
         mongo.db.meals.insert_one(meal)
         return redirect(url_for("dashboard"))
+
     return render_template("add_meal.html")
 
 # ------------------------
@@ -81,25 +82,8 @@ def add_sleep_page():
         }
         mongo.db.sleeps.insert_one(sleep)
         return redirect(url_for("dashboard"))
+
     return render_template("add_sleep.html")
-
-# ------------------------
-# ADD AI INSIGHTS
-# ------------------------
-@app.route("/ai-insights", methods=["GET", "POST"])
-def ai_insights_page():
-    if request.method == "POST":
-        data = request.form
-        insight = {
-            "title": data.get("title"),
-            "description": data.get("description")
-        }
-        mongo.db.ai_insights.insert_one(insight)
-        return redirect(url_for("ai_insights_page"))
-
-    # Fetch existing insights
-    insights = list(mongo.db.ai_insights.find({}, {"_id": 0}))
-    return render_template("ai_insights.html", insights=insights)
 
 # ------------------------
 # REGISTER API BLUEPRINTS
@@ -107,10 +91,10 @@ def ai_insights_page():
 app.register_blueprint(workout_bp)
 app.register_blueprint(meal_bp)
 app.register_blueprint(sleep_bp)
+app.register_blueprint(ai_bp)
 
 # ------------------------
 # RUN APP
 # ------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-    
