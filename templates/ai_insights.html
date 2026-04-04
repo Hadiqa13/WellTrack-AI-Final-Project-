@@ -1,52 +1,117 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Wellness Insights</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block title %}AI Insights - WellTrack AI{% endblock %}
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h2 class="mb-4 text-center"><i class="fas fa-brain text-primary me-2"></i>AI Insights</h2>
-        
-        <!-- Add New Insight Form -->
-        <div class="card mb-5">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Add New Insight</h5>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="title" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-plus me-2"></i>Add Insight
-                    </button>
-                </form>
-            </div>
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        .btn-box {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9fafc;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            color: #222;
+        }
+
+        .loading {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Wellness Insights</h1>
+        <p>Click the button below to generate personalized wellness insights.</p>
+
+        <div class="btn-box">
+            <button onclick="getInsights()">Generate Insights</button>
         </div>
 
-        <!-- Existing Insights -->
-        <h4 class="mb-3">Existing Insights</h4>
-        {% if insights %}
-        <div class="row g-4">
-            {% for insight in insights %}
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ insight.title }}</h5>
-                        <p class="card-text">{{ insight.description }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+        <div id="result" class="result-box">
+            Your AI wellness insights will appear here.
         </div>
-        {% else %}
-        <div class="alert alert-info text-center">
-            No insights added yet.
-        </div>
-        {% endif %}
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        async function getInsights() {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = '<span class="loading">Loading insights...</span>';
+
+            try {
+                const response = await fetch("/ai/insights");
+                const text = await response.text();
+
+                try {
+                    const data = JSON.parse(text);
+
+                    if (data.status === "success") {
+                        resultDiv.textContent = data.insights;
+                    } else {
+                        resultDiv.innerHTML = '<span class="error">Could not load insights.</span>';
+                    }
+                } catch (jsonError) {
+                    resultDiv.innerHTML = '<span class="error">' + text.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>
