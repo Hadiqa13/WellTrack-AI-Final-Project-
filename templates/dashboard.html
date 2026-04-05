@@ -26,6 +26,8 @@
                         <span>{{ workout['workout_type'] }}</span>
                         <span class="badge bg-success">{{ workout['duration'] }} min • {{ workout.get('calories_burned', 0) }} cal</span>
                     </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No workout data yet.</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -45,6 +47,8 @@
                         <span>{{ meal['meal_type'] }}</span>
                         <span class="badge bg-warning text-dark">{{ meal['calories'] }} cal</span>
                     </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No meal data yet.</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -65,6 +69,8 @@
                         <span>{{ sleep['duration'] }} hours</span>
                         <span class="badge bg-info">{{ sleep.get('quality', 'N/A') }}</span>
                     </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No sleep data yet.</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -75,7 +81,8 @@
 <!-- AI Insights Section -->
 <div class="mt-5">
     <h2 class="mb-4"><i class="fas fa-brain text-primary me-2"></i>AI Insights</h2>
-    {% if ai_insights %}
+
+    {% if ai_insights is defined and ai_insights %}
     <div class="row g-4">
         {% for insight in ai_insights %}
         <div class="col-md-6 col-lg-4">
