@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_cors import CORS
 from config import Config
 from services.db import mongo
@@ -12,6 +12,10 @@ app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
 mongo.init_app(app)
+
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "success"})
 
 # ------------------------
 # DASHBOARD
