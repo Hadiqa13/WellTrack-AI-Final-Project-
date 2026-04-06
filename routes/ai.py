@@ -3,14 +3,8 @@ from services.db import mongo
 from google import genai
 import os
 
-# Create AI blueprint
 ai_bp = Blueprint("ai", __name__)
 
-
-# ------------------------
-# GET RECENT DATA FROM DATABASE
-# Reads last few workout, meal, sleep records
-# ------------------------
 def get_recent_data():
     try:
         workouts = list(mongo.db.workouts.find({}, {"_id": 0}).limit(5))
@@ -32,11 +26,6 @@ def get_recent_data():
             "db_status": "disconnected"
         }
 
-
-# ------------------------
-# BUILD PROMPT FOR GEMINI
-# Converts user health data into prompt text
-# ------------------------
 def build_prompt(data):
     return f"""
 You are a wellness coach.
@@ -58,11 +47,6 @@ Sleep data:
 {data['sleeps']}
 """
 
-
-# ------------------------
-# FALLBACK RESPONSE
-# Used if Gemini key missing or API fails
-# ------------------------
 def fallback_insights(data):
     workout_count = len(data["workouts"])
     meal_count = len(data["meals"])
@@ -87,14 +71,9 @@ Goals:
 3. Aim for a more consistent sleep schedule.
 """.strip()
 
-
-# ------------------------
-# GENERATE AI INSIGHTS USING GEMINI
-# ------------------------
 def generate_gemini_insights(data):
     api_key = os.getenv("GEMINI_API_KEY")
 
-    # If no key, use fallback response
     if not api_key:
         return fallback_insights(data)
 
@@ -115,22 +94,12 @@ def generate_gemini_insights(data):
     except Exception:
         return fallback_insights(data)
 
-
-# ------------------------
-# AI PAGE
-# Protected page - must login first
-# ------------------------
 @ai_bp.route("/ai_page")
 def ai_page():
     if "user" not in session:
         return redirect(url_for("login"))
     return render_template("ai_insights.html")
 
-
-# ------------------------
-# AI INSIGHTS API
-# Protected route - must login first
-# ------------------------
 @ai_bp.route("/ai/insights", methods=["GET"])
 def insights():
     if "user" not in session:
