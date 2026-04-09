@@ -20,11 +20,32 @@
             </div>
             <div class="card-body">
                 <p class="fs-5"><strong>Avg Duration:</strong> {{ avg_workout }} minutes</p>
+
                 <ul class="list-group list-group-flush">
                     {% for workout in workouts %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ workout['workout_type'] }}</span>
-                        <span class="badge bg-success">{{ workout['duration'] }} min • {{ workout.get('calories_burned', 0) }} cal</span>
+                    <li class="list-group-item">
+                        <!-- First row: workout info -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ workout['workout_type'] }}</span>
+                            <span class="badge bg-success">
+                                {{ workout['duration'] }} min • {{ workout.get('calories_burned', 0) }} cal
+                            </span>
+                        </div>
+
+                        <!-- Second row: edit and delete buttons -->
+                        <div class="mt-2 d-flex gap-2">
+                            <!-- Edit button -->
+                            <a href="{{ url_for('edit_workout', id=workout['_id']) }}" class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+
+                            <!-- Delete button -->
+                            <form action="{{ url_for('delete_workout', id=workout['_id']) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </li>
                     {% else %}
                     <li class="list-group-item text-muted">No workout data yet.</li>
@@ -43,9 +64,29 @@
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     {% for meal in meals %}
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>{{ meal['meal_type'] }}</span>
-                        <span class="badge bg-warning text-dark">{{ meal['calories'] }} cal</span>
+                    <li class="list-group-item">
+                        <!-- First row: meal info -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ meal['meal_type'] }}</span>
+                            <span class="badge bg-warning text-dark">
+                                {{ meal['calories'] }} cal
+                            </span>
+                        </div>
+
+                        <!-- Second row: edit and delete buttons -->
+                        <div class="mt-2 d-flex gap-2">
+                            <!-- Edit button -->
+                            <a href="{{ url_for('edit_meal', id=meal['_id']) }}" class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+
+                            <!-- Delete button -->
+                            <form action="{{ url_for('delete_meal', id=meal['_id']) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </li>
                     {% else %}
                     <li class="list-group-item text-muted">No meal data yet.</li>
@@ -63,11 +104,32 @@
             </div>
             <div class="card-body">
                 <p class="fs-5"><strong>Avg Sleep:</strong> {{ avg_sleep }} hours</p>
+
                 <ul class="list-group list-group-flush">
                     {% for sleep in sleeps %}
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>{{ sleep['duration'] }} hours</span>
-                        <span class="badge bg-info">{{ sleep.get('quality', 'N/A') }}</span>
+                    <li class="list-group-item">
+                        <!-- First row: sleep info -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ sleep['duration'] }} hours</span>
+                            <span class="badge bg-info">
+                                {{ sleep.get('quality', 'N/A') }}
+                            </span>
+                        </div>
+
+                        <!-- Second row: edit and delete buttons -->
+                        <div class="mt-2 d-flex gap-2">
+                            <!-- Edit button -->
+                            <a href="{{ url_for('edit_sleep', id=sleep['_id']) }}" class="btn btn-sm btn-outline-primary">
+                                Edit
+                            </a>
+
+                            <!-- Delete button -->
+                            <form action="{{ url_for('delete_sleep', id=sleep['_id']) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </li>
                     {% else %}
                     <li class="list-group-item text-muted">No sleep data yet.</li>
