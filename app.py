@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from flask_cors import CORS
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from bson.objectid import ObjectId   # Used to work with MongoDB document IDs
 
 from config import Config
 from services.db import mongo
@@ -17,7 +18,7 @@ app = Flask(__name__)
 
 # Load values from config.py
 app.config.from_object(Config)
-
+print("MONGO_URI =", app.config.get("MONGO_URI"))
 # Secret key is needed for session/login
 app.secret_key = app.config.get("SECRET_KEY", "mysecret123")
 
@@ -30,7 +31,7 @@ mongo.init_app(app)
 
 # ------------------------
 # LOGIN REQUIRED DECORATOR
-# Protect pages that need login
+# This protects routes so only logged-in users can open them
 # ------------------------
 def login_required(f):
     @wraps(f)
@@ -126,24 +127,29 @@ def health():
 # ------------------------
 # DASHBOARD
 # Protected page
+# IMPORTANT:
+# We use find() without hiding _id
+# because _id is needed for edit/delete buttons
 # ------------------------
 @app.route("/")
 @app.route("/dashboard")
 @login_required
 def dashboard():
     try:
-        workouts = list(mongo.db.workouts.find({}, {"_id": 0}))
-        meals = list(mongo.db.meals.find({}, {"_id": 0}))
-        sleeps = list(mongo.db.sleeps.find({}, {"_id": 0}))
+        workouts = list(mongo.db.workouts.find())
+        meals = list(mongo.db.meals.find())
+        sleeps = list(mongo.db.sleeps.find())
     except Exception:
         workouts = []
         meals = []
         sleeps = []
 
+    # Calculate average workout duration
     avg_workout = round(
         sum(w.get("duration", 0) for w in workouts) / len(workouts), 2
     ) if workouts else 0
 
+    # Calculate average sleep duration
     avg_sleep = round(
         sum(s.get("duration", 0) for s in sleeps) / len(sleeps), 2
     ) if sleeps else 0
@@ -160,7 +166,6 @@ def dashboard():
 
 # ------------------------
 # ADD WORKOUT PAGE
-# Protected page
 # ------------------------
 @app.route("/add-workout", methods=["GET", "POST"])
 @login_required
@@ -188,8 +193,58 @@ def add_workout_page():
 
 
 # ------------------------
+# EDIT WORKOUT PAGE
+# Opens selected workout and updates it
+# ------------------------
+@app.route("/edit-workout/<id>", methods=["GET", "POST"])
+@login_required
+def edit_workout(id):
+    workout = mongo.db.workouts.find_one({"_id": ObjectId(id)})
+
+    if not workout:
+        return "Workout not found", 404
+
+    error = None
+
+    if request.method == "POST":
+        try:
+            updated_workout = {
+                "workout_type": request.form.get("workout_type"),
+                "duration": int(request.form.get("duration")),
+                "calories_burned": int(request.form.get("calories_burned", 0)),
+                "date": request.form.get("date"),
+                "created_by": session.get("user")
+            }
+
+            mongo.db.workouts.update_one(
+                {"_id": ObjectId(id)},
+                {"$set": updated_workout}
+            )
+
+            return redirect(url_for("dashboard"))
+        except Exception:
+            error = "Failed to update workout."
+
+    return render_template("edit_workout.html", workout=workout, error=error)
+
+
+# ------------------------
+# DELETE WORKOUT
+# Deletes selected workout from database
+# POST is safer for delete than GET
+# ------------------------
+@app.route("/delete-workout/<id>", methods=["POST"])
+@login_required
+def delete_workout(id):
+    try:
+        mongo.db.workouts.delete_one({"_id": ObjectId(id)})
+        return redirect(url_for("dashboard"))
+    except Exception:
+        return "Failed to delete workout", 500
+
+
+# ------------------------
 # ADD MEAL PAGE
-# Protected page
 # ------------------------
 @app.route("/add-meal", methods=["GET", "POST"])
 @login_required
@@ -215,8 +270,55 @@ def add_meal_page():
 
 
 # ------------------------
+# EDIT MEAL PAGE
+# Opens selected meal and updates it
+# ------------------------
+@app.route("/edit-meal/<id>", methods=["GET", "POST"])
+@login_required
+def edit_meal(id):
+    meal = mongo.db.meals.find_one({"_id": ObjectId(id)})
+
+    if not meal:
+        return "Meal not found", 404
+
+    error = None
+
+    if request.method == "POST":
+        try:
+            updated_meal = {
+                "meal_type": request.form.get("meal_type"),
+                "calories": int(request.form.get("calories")),
+                "created_by": session.get("user")
+            }
+
+            mongo.db.meals.update_one(
+                {"_id": ObjectId(id)},
+                {"$set": updated_meal}
+            )
+
+            return redirect(url_for("dashboard"))
+        except Exception:
+            error = "Failed to update meal."
+
+    return render_template("edit_meal.html", meal=meal, error=error)
+
+
+# ------------------------
+# DELETE MEAL
+# Deletes selected meal from database
+# ------------------------
+@app.route("/delete-meal/<id>", methods=["POST"])
+@login_required
+def delete_meal(id):
+    try:
+        mongo.db.meals.delete_one({"_id": ObjectId(id)})
+        return redirect(url_for("dashboard"))
+    except Exception:
+        return "Failed to delete meal", 500
+
+
+# ------------------------
 # ADD SLEEP PAGE
-# Protected page
 # ------------------------
 @app.route("/add-sleep", methods=["GET", "POST"])
 @login_required
@@ -242,7 +344,56 @@ def add_sleep_page():
 
 
 # ------------------------
+# EDIT SLEEP PAGE
+# Opens selected sleep record and updates it
+# ------------------------
+@app.route("/edit-sleep/<id>", methods=["GET", "POST"])
+@login_required
+def edit_sleep(id):
+    sleep = mongo.db.sleeps.find_one({"_id": ObjectId(id)})
+
+    if not sleep:
+        return "Sleep record not found", 404
+
+    error = None
+
+    if request.method == "POST":
+        try:
+            updated_sleep = {
+                "duration": float(request.form.get("duration")),
+                "quality": request.form.get("quality"),
+                "created_by": session.get("user")
+            }
+
+            mongo.db.sleeps.update_one(
+                {"_id": ObjectId(id)},
+                {"$set": updated_sleep}
+            )
+
+            return redirect(url_for("dashboard"))
+        except Exception:
+            error = "Failed to update sleep record."
+
+    return render_template("edit_sleep.html", sleep=sleep, error=error)
+
+
+# ------------------------
+# DELETE SLEEP
+# Deletes selected sleep record from database
+# ------------------------
+@app.route("/delete-sleep/<id>", methods=["POST"])
+@login_required
+def delete_sleep(id):
+    try:
+        mongo.db.sleeps.delete_one({"_id": ObjectId(id)})
+        return redirect(url_for("dashboard"))
+    except Exception:
+        return "Failed to delete sleep record", 500
+
+
+# ------------------------
 # REGISTER API BLUEPRINTS
+# These are your existing API routes
 # ------------------------
 app.register_blueprint(workout_bp)
 app.register_blueprint(meal_bp)

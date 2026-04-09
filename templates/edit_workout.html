@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Workout</title>
+</head>
+<body>
+    <h2>Edit Workout</h2>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label>Workout Type:</label><br>
+        <input type="text" name="workout_type" value="{{ workout.workout_type }}" required><br><br>
+
+        <label>Duration:</label><br>
+        <input type="number" name="duration" value="{{ workout.duration }}" required><br><br>
+
+        <label>Calories Burned:</label><br>
+        <input type="number" name="calories_burned" value="{{ workout.calories_burned }}" required><br><br>
+
+        <label>Date:</label><br>
+        <input type="date" name="date" value="{{ workout.date }}" required><br><br>
+
+        <button type="submit">Update Workout</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
