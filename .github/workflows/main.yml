@@ -9,6 +9,9 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -35,7 +38,6 @@ jobs:
     needs: test-and-build
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
     steps:
       - name: Trigger Render deploy
         run: curl "$RENDER_DEPLOY_HOOK_URL"
