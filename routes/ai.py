@@ -8,8 +8,7 @@ ai_bp = Blueprint("ai", __name__)
 
 # ------------------------
 # GET RECENT USER DATA
-# This gets the latest data from MongoDB
-# and filters by the logged-in user
+# Gets only current user's data
 # ------------------------
 def get_recent_data():
     try:
@@ -57,7 +56,7 @@ def get_recent_data():
 
 # ------------------------
 # BUILD PROMPT FOR GEMINI
-# This sends real user data to AI
+# Sends real user data to AI
 # ------------------------
 def build_prompt(data):
     return f"""
@@ -89,7 +88,7 @@ Sleep data:
 
 # ------------------------
 # FALLBACK RESPONSE
-# Used if Gemini API key is missing or Gemini fails
+# Used if Gemini fails
 # ------------------------
 def fallback_insights(data):
     workout_count = len(data["workouts"])
@@ -117,12 +116,12 @@ Goals:
 
 
 # ------------------------
-# GENERATE AI INSIGHTS USING GEMINI
+# GENERATE GEMINI INSIGHTS
 # ------------------------
 def generate_gemini_insights(data):
     api_key = os.getenv("GEMINI_API_KEY")
 
-    # If API key is missing, use fallback
+    # If API key missing, use fallback
     if not api_key:
         return fallback_insights(data)
 
@@ -157,6 +156,8 @@ def ai_page():
 
 # ------------------------
 # AI INSIGHTS API
+# Returns JSON
+# Also saves result in session
 # ------------------------
 @ai_bp.route("/ai/insights", methods=["GET"])
 def insights():
@@ -169,8 +170,30 @@ def insights():
     data = get_recent_data()
     result = generate_gemini_insights(data)
 
+    # Save insights so dashboard can show them
+    session["ai_insights"] = result
+
     return jsonify({
         "status": "success",
         "insights": result,
         "data_used": data
     })
+
+
+# ------------------------
+# GENERATE + REDIRECT
+# Better for button click
+# ------------------------
+@ai_bp.route("/generate-insights")
+def generate_and_redirect():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    data = get_recent_data()
+    result = generate_gemini_insights(data)
+
+    # Save to session
+    session["ai_insights"] = result
+
+    # Go back to dashboard to show result
+    return redirect(url_for("dashboard"))

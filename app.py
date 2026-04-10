@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from flask_cors import CORS
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
-from bson.objectid import ObjectId   # Used to work with MongoDB document IDs
+from bson.objectid import ObjectId
 
 from config import Config
 from services.db import mongo
@@ -16,10 +16,10 @@ from routes.ai import ai_bp
 # ------------------------
 app = Flask(__name__)
 
-# Load values from config.py
+# Load config
 app.config.from_object(Config)
-print("MONGO_URI =", app.config.get("MONGO_URI"))
-# Secret key is needed for session/login
+
+# Secret key for session
 app.secret_key = app.config.get("SECRET_KEY", "mysecret123")
 
 # Enable CORS
@@ -31,7 +31,6 @@ mongo.init_app(app)
 
 # ------------------------
 # LOGIN REQUIRED DECORATOR
-# This protects routes so only logged-in users can open them
 # ------------------------
 def login_required(f):
     @wraps(f)
@@ -44,7 +43,6 @@ def login_required(f):
 
 # ------------------------
 # REGISTER PAGE
-# Saves user in MongoDB "users" collection
 # ------------------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -57,13 +55,12 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        # Check if username already exists
+        # Check if username exists
         existing_user = mongo.db.users.find_one({"username": username})
 
         if existing_user:
             error = "Username already exists. Please choose another one."
         else:
-            # Hash password before saving
             hashed_password = generate_password_hash(password)
 
             user_data = {
@@ -81,7 +78,6 @@ def register():
 
 # ------------------------
 # LOGIN PAGE
-# Checks username and password from database
 # ------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -91,10 +87,10 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Find user in MongoDB
+        # Find user
         user = mongo.db.users.find_one({"username": username})
 
-        # Check if user exists and password is correct
+        # Check password
         if user and check_password_hash(user["password"], password):
             session["user"] = user["username"]
             session["full_name"] = user.get("full_name", "")
@@ -107,7 +103,6 @@ def login():
 
 # ------------------------
 # LOGOUT
-# Clears session and returns to login page
 # ------------------------
 @app.route("/logout")
 def logout():
@@ -117,7 +112,6 @@ def logout():
 
 # ------------------------
 # HEALTH ENDPOINT
-# Used for testing / CI / Docker
 # ------------------------
 @app.route("/api/health")
 def health():
@@ -126,33 +120,36 @@ def health():
 
 # ------------------------
 # DASHBOARD
-# Protected page
-# IMPORTANT:
-# We use find() without hiding _id
-# because _id is needed for edit/delete buttons
+# Show only current user's data
 # ------------------------
 @app.route("/")
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    current_user = session.get("user")
+
     try:
-        workouts = list(mongo.db.workouts.find())
-        meals = list(mongo.db.meals.find())
-        sleeps = list(mongo.db.sleeps.find())
+        # Filter by logged-in user
+        workouts = list(mongo.db.workouts.find({"created_by": current_user}))
+        meals = list(mongo.db.meals.find({"created_by": current_user}))
+        sleeps = list(mongo.db.sleeps.find({"created_by": current_user}))
     except Exception:
         workouts = []
         meals = []
         sleeps = []
 
-    # Calculate average workout duration
+    # Average workout duration
     avg_workout = round(
         sum(w.get("duration", 0) for w in workouts) / len(workouts), 2
     ) if workouts else 0
 
-    # Calculate average sleep duration
+    # Average sleep duration
     avg_sleep = round(
         sum(s.get("duration", 0) for s in sleeps) / len(sleeps), 2
     ) if sleeps else 0
+
+    # Get saved AI insights from session
+    ai_insights = session.get("ai_insights", "")
 
     return render_template(
         "dashboard.html",
@@ -160,7 +157,8 @@ def dashboard():
         meals=meals,
         sleeps=sleeps,
         avg_workout=avg_workout,
-        avg_sleep=avg_sleep
+        avg_sleep=avg_sleep,
+        ai_insights=ai_insights
     )
 
 
@@ -194,7 +192,6 @@ def add_workout_page():
 
 # ------------------------
 # EDIT WORKOUT PAGE
-# Opens selected workout and updates it
 # ------------------------
 @app.route("/edit-workout/<id>", methods=["GET", "POST"])
 @login_required
@@ -230,8 +227,6 @@ def edit_workout(id):
 
 # ------------------------
 # DELETE WORKOUT
-# Deletes selected workout from database
-# POST is safer for delete than GET
 # ------------------------
 @app.route("/delete-workout/<id>", methods=["POST"])
 @login_required
@@ -271,7 +266,6 @@ def add_meal_page():
 
 # ------------------------
 # EDIT MEAL PAGE
-# Opens selected meal and updates it
 # ------------------------
 @app.route("/edit-meal/<id>", methods=["GET", "POST"])
 @login_required
@@ -305,7 +299,6 @@ def edit_meal(id):
 
 # ------------------------
 # DELETE MEAL
-# Deletes selected meal from database
 # ------------------------
 @app.route("/delete-meal/<id>", methods=["POST"])
 @login_required
@@ -345,7 +338,6 @@ def add_sleep_page():
 
 # ------------------------
 # EDIT SLEEP PAGE
-# Opens selected sleep record and updates it
 # ------------------------
 @app.route("/edit-sleep/<id>", methods=["GET", "POST"])
 @login_required
@@ -379,7 +371,6 @@ def edit_sleep(id):
 
 # ------------------------
 # DELETE SLEEP
-# Deletes selected sleep record from database
 # ------------------------
 @app.route("/delete-sleep/<id>", methods=["POST"])
 @login_required
@@ -392,8 +383,7 @@ def delete_sleep(id):
 
 
 # ------------------------
-# REGISTER API BLUEPRINTS
-# These are your existing API routes
+# REGISTER BLUEPRINTS
 # ------------------------
 app.register_blueprint(workout_bp)
 app.register_blueprint(meal_bp)

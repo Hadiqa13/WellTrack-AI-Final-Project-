@@ -37,7 +37,8 @@
             margin-top: 20px;
         }
 
-        button {
+        .btn-link {
+            display: inline-block;
             background-color: #4CAF50;
             color: white;
             padding: 12px 22px;
@@ -45,9 +46,10 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            text-decoration: none;
         }
 
-        button:hover {
+        .btn-link:hover {
             background-color: #45a049;
         }
 
@@ -57,20 +59,10 @@
             background: #f9fafc;
             border: 1px solid #ddd;
             border-radius: 10px;
-            min-height: 150px;
+            min-height: 120px;
             white-space: pre-wrap;
             color: #222;
-        }
-
-        .loading {
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-            white-space: pre-wrap;
+            text-align: center;
         }
     </style>
 </head>
@@ -80,38 +72,13 @@
         <p>Click the button below to generate personalized wellness insights.</p>
 
         <div class="btn-box">
-            <button onclick="getInsights()">Generate Insights</button>
+            <!-- This will generate insights and redirect to dashboard -->
+            <a href="/generate-insights" class="btn-link">Generate Insights</a>
         </div>
 
-        <div id="result" class="result-box">
-            Your AI wellness insights will appear here.
+        <div class="result-box">
+            After clicking the button, you will be redirected to the dashboard and the AI insights will appear there.
         </div>
     </div>
-
-    <script>
-        async function getInsights() {
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = '<span class="loading">Loading insights...</span>';
-
-            try {
-                const response = await fetch("/ai/insights");
-                const text = await response.text();
-
-                try {
-                    const data = JSON.parse(text);
-
-                    if (data.status === "success") {
-                        resultDiv.textContent = data.insights;
-                    } else {
-                        resultDiv.innerHTML = '<span class="error">Could not load insights.</span>';
-                    }
-                } catch (jsonError) {
-                    resultDiv.innerHTML = '<span class="error">' + text.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</span>';
-                }
-            } catch (error) {
-                resultDiv.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
-            }
-        }
-    </script>
 </body>
 </html>
