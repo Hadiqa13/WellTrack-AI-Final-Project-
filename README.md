@@ -5,7 +5,7 @@ App Name: Health Wellness Tracker
 
 GitHub Repository URL: Hadiqa13/WellTrack-AI-Final-Project- 
 
-Render Live App URL: https://welltrack-ai-final-project-latest.onrender.com 
+Render Live App URL: https://welltrack-ai-final-project-rj7w.onrender.com 
 
 Container Image URL: https://hub.docker.com/layers/aliaafzal/welltrack-ai-final-project/latest  
 
