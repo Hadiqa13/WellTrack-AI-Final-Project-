@@ -113,7 +113,7 @@ def logout():
 # ------------------------
 # HEALTH ENDPOINT
 # ------------------------
-@app.route("/health")
+@app.route("/api/health")
 def health():
     return jsonify({"status": "success"})
 
