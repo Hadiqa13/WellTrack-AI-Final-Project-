@@ -10,6 +10,7 @@ from routes.workout_routes import workout_bp
 from routes.meal_routes import meal_bp
 from routes.sleep_routes import sleep_bp
 from routes.ai import ai_bp
+import os
 
 # ------------------------
 # CREATE FLASK APP
@@ -20,7 +21,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Secret key for session
-app.secret_key = app.config.get("SECRET_KEY", "mysecret123")
+app.secret_key = os.environ.get("SECRET_KEY", "dev_secret_key_123")
 
 # Enable CORS
 CORS(app)
