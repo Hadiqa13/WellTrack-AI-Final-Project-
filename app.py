@@ -16,6 +16,14 @@ from routes.ai import ai_bp
 # ------------------------
 app = Flask(__name__)
 
+# ------------------------
+# HEALTH ENDPOINT
+# ------------------------
+@app.route("/api/health")
+def api_health():
+    return {"status": "success"}, 200
+
+
 # Load config
 app.config.from_object(Config)
 
@@ -108,14 +116,6 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
-
-
-# ------------------------
-# HEALTH ENDPOINT
-# ------------------------
-@app.route("/api/health")
-def health():
-    return jsonify({"status": "success"})
 
 
 # ------------------------
@@ -389,13 +389,6 @@ app.register_blueprint(workout_bp)
 app.register_blueprint(meal_bp)
 app.register_blueprint(sleep_bp)
 app.register_blueprint(ai_bp)
-
-# ------------------------
-# HEALTH ENDPOINT
-# ------------------------
-#@app.route("/health", methods=["GET"])
-#def health():
-#    return {"status": "ok"}
 
 # ------------------------
 # RUN APP
