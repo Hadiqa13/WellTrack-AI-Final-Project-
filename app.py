@@ -113,7 +113,7 @@ def logout():
 # ------------------------
 # HEALTH ENDPOINT
 # ------------------------
-@app.route("/api/health")
+@app.route("/health")
 def health():
     return jsonify({"status": "success"})
 
@@ -390,9 +390,16 @@ app.register_blueprint(meal_bp)
 app.register_blueprint(sleep_bp)
 app.register_blueprint(ai_bp)
 
+# ------------------------
+# HEALTH ENDPOINT
+# ------------------------
+#@app.route("/health", methods=["GET"])
+#def health():
+#    return {"status": "ok"}
 
 # ------------------------
 # RUN APP
 # ------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+    
