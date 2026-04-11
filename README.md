@@ -1,5 +1,15 @@
 #  WellTrack AI – Intelligent Health & Wellness Tracker
 
+
+App Name: Health Wellness Tracker  
+
+GitHub Repository URL: Hadiqa13/WellTrack-AI-Final-Project- 
+
+Render Live App URL: https://welltrack-ai-final-project-latest.onrender.com 
+
+Container Image URL: https://hub.docker.com/layers/aliaafzal/welltrack-ai-final-project/latest  
+
+
 ##  Overview
 
 **WellTrack AI** is an AI-powered health and wellness tracking platform designed to help users monitor their daily lifestyle habits and receive intelligent, personalized feedback.
